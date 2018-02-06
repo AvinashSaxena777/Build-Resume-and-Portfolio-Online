@@ -1,0 +1,200 @@
+<?php
+session_start();
+define('DB_SERVER', 'localhost');
+   define('DB_USERNAME', 'root');
+   define('DB_PASSWORD', '');
+   define('DB_DATABASE', 'test');
+   $db = mysqli_connect(DB_SERVER,DB_USERNAME,DB_PASSWORD,DB_DATABASE);
+    if (mysqli_connect_errno())
+  {
+  echo "Failed to connect to MySQL: " . mysqli_connect_error();
+  }
+
+    if(isset($_POST['add_skill'])){
+
+        $skill_name=$_POST['skill_name'];
+        $skill_rating=$_POST['skill_rating'];
+        $id = $_SESSION['id'];
+        $sql = "INSERT INTO skills (id, skill_name, skill_rating) VALUES ('$id', '$skill_name', '$skill_rating' )";
+
+        if (mysqli_query($db, $sql)) {
+            header( "Location: skills.php");
+        } else {
+            echo mysqli_error($db);
+        }  
+
+    } 
+    $id = $_SESSION['id'];
+    $query2 = "select * from skills where id='$id'";
+        //echo $query;
+        $query2_run = mysqli_query($db,$query2);
+        //echo mysql_num_rows($query_run);
+        if($query2_run)
+        {
+            $i=-1;
+            while($row = mysqli_fetch_array($query2_run,MYSQLI_ASSOC)){
+                $i++;
+                $skillrow[$i]= $row;
+                $_SESSION['skill']=$skillrow;
+            }
+            $num_skillrow=$i;
+        }
+        else
+        {
+            echo '<script type="text/javascript">alert("No such User exists. Invalid Credentials")</script>';
+        }
+
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	
+	<meta name="description" content="">
+	
+	<meta name="author" content="">
+	
+	<link rel="icon" href="images/favicon.ico">
+	
+	<title>Dashboard</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!--Fonts-->
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link href="css/font-awesome.css" rel="stylesheet">
+    
+    <!-- Custom styles for this template -->
+    <link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+	<div class="container-fluid" id="wrapper">
+		<div class="row">
+			<nav class="sidebar col-xs-12 col-sm-4 col-lg-3 col-xl-2 bg-faded sidebar-style-1" style="
+				background-color: #387DC2;
+			">
+				<h1 class="site-title"><a href="/Complete Website/Front/index.php"><em class="fa"></em>Resume and Online Portfolio Builder</a></h1>
+				
+				<a href="#menu-toggle" class="btn btn-default" id="menu-toggle"><em class="fa fa-bars"></em></a>
+				
+				<ul class="nav nav-pills flex-column sidebar-nav">
+					<li class="nav-item"><a class="nav-link" href="index.php" style="text-align: center;"><em class="fa fa-dashboard"></em> Dashboard</a></li>
+					<li class="nav-item"><a class="nav-link active" href="info.php" style="text-align: center;"><em class="fa fa-clone"></em>Basic Informations <span class="sr-only">(current)</span></a></li>
+					<li class="nav-item"><a class="nav-link" href="educational.php" style="text-align: center;"><em class="fa fa-calendar-o"></em>Educational Details</a></li>
+					<li class="nav-item"><a class="nav-link" href="experience.php" style="text-align: center;"><em class="fa fa-bar-chart"></em>Expiriences and Works</a></li>
+                    <li class="nav-item"><a class="nav-link" href="skills.php" style="text-align: center;"><em class="fa"></em>Skills</a></li>
+					<li class="nav-item"><a class="nav-link" href="about.php" style="text-align: center;"><em class="fa fa-hand-o-up"></em>About</a></li>
+					<li class="nav-item"><a class="nav-link" href="projects.php" style="text-align: center;"><em class="fa fa-clone"></em>Projects</a></li>
+				</ul>
+				</nav>
+			
+			<main class="col-xs-12 col-sm-8 offset-sm-4 col-lg-9 offset-lg-3 col-xl-10 offset-xl-2 pt-3 pl-4">
+				<header class="page-header row justify-center">
+					<div class="col-md-6 col-lg-8" >
+						<h1 class="float-left text-center text-left">Skills</h1>
+					</div>
+					<div class="card" style="width: 80%;">
+            <div class="card-block">
+                <h4 class="card-title btn btn-dark" style="width: 100%"></h4>
+                <ul class="list-group">
+                    <div class="list-group">
+                        <?php
+                    $i=0;
+                    while($i<=$num_skillrow){
+                ?>
+                            <button type="button" class="list-group-item list-group-item-action">
+                <?php
+                    echo $skillrow[$i]['skill_name'];?><br><?php
+                    echo 'Rating Out Of 10 ='.$skillrow[$i]['skill_rating'];
+                    $i=$i+1;
+                    }
+                ?>
+              </button>
+                    </div>
+                </ul>
+                <br>
+                <center><button class="btn btn-dark" data-toggle="modal" data-target=".bd-example-modal-lg3">Add Skill</button></center><br>
+
+                <div class="modal fade bd-example-modal-lg3" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-md">
+                        <div class="modal-content">
+                            <div class="container">
+
+                                <div class="card card-register mx-auto mt-5">
+                                    <div class="card-header">
+                                        Update Your Information
+                                    </div>
+                                    <div class="card-body">
+                                        <form action="" method="post">
+                                            <div class="form-group">
+                                                <div class="form-row">
+                                                    <div class="col-md-6" style="padding: 20px">
+                                                        <label for="exampleInputName">Skill</label>
+                                                        <input type="text" class="form-control" id="skill_name" name="skill_name" aria-describedby="nameHelp" placeholder="e.g. Python">
+                                                        <label style="padding-top: 17px" for="exampleInputName">Rate Yourself Out of 10</label>
+                                                        <input type="text" class="form-control" id="skill_rating" name="skill_rating" aria-describedby="nameHelp" placeholder="e.g. 6.5">
+                                                        <br>
+                                                        <input type="submit" class="btn btn-danger" name="add_skill" value="Add Skills">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-dark" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+					
+
+                            
+								
+								
+								
+								
+								
+											
+							
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <script src="dist/js/bootstrap.min.js"></script>
+    
+    <script src="js/chart.min.js"></script>
+    <script src="js/chart-data.js"></script>
+    <script src="js/easypiechart.js"></script>
+    <script src="js/easypiechart-data.js"></script>
+    <script src="js/bootstrap-datepicker.js"></script>
+    <script src="js/custom.js"></script>
+    <script>
+	    window.onload = function () {
+	var chart1 = document.getElementById("line-chart").getContext("2d");
+	window.myLine = new Chart(chart1).Line(lineChartData, {
+	responsive: true,
+	scaleLineColor: "rgba(0,0,0,.2)",
+	scaleGridLineColor: "rgba(0,0,0,.05)",
+	scaleFontColor: "#c5c7cc"
+	});
+};
+	</script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+    
+	  </body>
+</html>
